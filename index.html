@@ -415,8 +415,11 @@
 
     <script>
         // Configuration
-        const API_KEY = 'your_openweather_api_key'; // Replace with your actual API key
-        const API_BASE = 'https://api.openweathermap.org/data/2.5';
+        const API_KEY = 'ab7caf11c5174cf2af950824252908'; // Replace with your actual API key
+        // const API_KEY = "Uncomment Above Line"
+        // const API_BASE = 'https://api.openweathermap.org/data/2.5';
+        // "http://api.weatherapi.com/v1/current.json?key=ab7caf11c5174cf2af950824252908&q=Chennai&aqi=no"
+        const API_BASE = 'https://api.weatherapi.com/v1';
 
         // Weather icons mapping
         const WEATHER_ICONS = {
@@ -435,6 +438,7 @@
 
         // Get icon class based on weather condition
         function getIconClass(condition) {
+            console.log(condition);
             const lower = condition.toLowerCase();
             if (lower.includes('clear') || lower.includes('sun')) return 'sunny';
             if (lower.includes('rain') || lower.includes('drizzle')) return 'rainy';
@@ -474,67 +478,74 @@
 
         // Mock weather data for demo (replace with real API)
         async function fetchWeatherData(city) {
-            // Simulate loading delay
-            await new Promise(resolve => setTimeout(resolve, 800));
+            // // Simulate loading delay
+            // await new Promise(resolve => setTimeout(resolve, 800));
             
-            // Demo data - replace with real API call
-            const temps = [18, 22, 25];
-            const conditions = ['Partly Sunny', 'Rain Showers', 'Thunderstorms'];
-            const times = ['Current', 'Tomorrow 2PM', 'Day After 6PM'];
+            // // Demo data - replace with real API call
+            // const temps = [18, 22, 25];
+            // const conditions = ['Partly Sunny', 'Rain Showers', 'Thunderstorms'];
+            // const times = ['Current', 'Tomorrow 2PM', 'Day After 6PM'];
             
-            return {
-                city: city,
-                current: {
-                    temp: Math.round(Math.random() * 15 + 15),
-                    condition: 'Partly Sunny',
-                    time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-                },
-                forecast: [
-                    {
-                        temp: Math.round(Math.random() * 10 + 18),
-                        condition: 'Light Rain',
-                        time: 'Tomorrow 2PM'
-                    },
-                    {
-                        temp: Math.round(Math.random() * 8 + 22),
-                        condition: 'Thunderstorms',
-                        time: 'Day After 6PM'
-                    }
-                ]
-            };
+            // return {
+            //     city: city,
+            //     current: {
+            //         temp: Math.round(Math.random() * 15 + 15),
+            //         condition: 'Partly Sunny',
+            //         time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            //     },
+            //     forecast: [
+            //         {
+            //             temp: Math.round(Math.random() * 10 + 18),
+            //             condition: 'Light Rain',
+            //             time: 'Tomorrow 2PM'
+            //         },
+            //         {
+            //             temp: Math.round(Math.random() * 8 + 22),
+            //             condition: 'Thunderstorms',
+            //             time: 'Day After 6PM'
+            //         }
+            //     ]
+            // };
             
-            /* 
+            
             // Real API implementation - uncomment and use your API key
             try {
-                const currentResponse = await fetch(
-                    `${API_BASE}/weather?q=${city}&appid=${API_KEY}&units=metric`
-                );
+                // const currentResponse = await fetch(
+                //     `${API_BASE}/current.json?q=${city}&key=${API_KEY}&aqi=no`
+                // );
                 const forecastResponse = await fetch(
-                    `${API_BASE}/forecast?q=${city}&appid=${API_KEY}&units=metric`
+                    `${API_BASE}/forecast.json?q=${city}&key=${API_KEY}&days=2&aqi=no`
                 );
                 
-                if (!currentResponse.ok) throw new Error('City not found');
+                if (!forecastResponse.ok) throw new Error('City not found');
                 
-                const current = await currentResponse.json();
+                // const current = await currentResponse.json();
                 const forecast = await forecastResponse.json();
-                
-                return {
-                    city: current.name,
+
+                console.log(forecast);
+                console.log(forecast.forecast.forecastday[0].hour);
+
+                const res = {
+                    city: forecast.location.name,
                     current: {
-                        temp: Math.round(current.main.temp),
-                        condition: current.weather[0].description,
+                        temp: Math.round(forecast.current.temp_c),
+                        condition: forecast.current.condition.text,
                         time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
                     },
-                    forecast: forecast.list.slice(1, 3).map((item, index) => ({
-                        temp: Math.round(item.main.temp),
-                        condition: item.weather[0].description,
+                    forecast: forecast.forecast.forecastday[0].hour.slice(3, 5).map((item, index) => ({
+                        temp: Math.round(item.temp_c),
+                        condition: item.condition.text,
                         time: index === 0 ? 'Tomorrow 2PM' : 'Day After 6PM'
                     }))
-                };
+                }
+
+                console.log(res);
+                
+                return res;
             } catch (error) {
                 throw new Error('Unable to fetch weather data. Please check the city name.');
             }
-            */
+            
         }
 
         // Display weather data
